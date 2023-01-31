@@ -15,11 +15,11 @@
  */
 
 variable "project_id" {
-  description = "The project ID to deploy to"
-  type        = string
+  description = "Project where the dataset and table are created."
 }
 
-variable "bucket_name" {
-  description = "The name of the bucket to create"
-  type        = string
+variable "delete_contents_on_destroy" {
+  description = "(Optional) If set to true, delete all the tables in the dataset when destroying the resource; otherwise, destroying the resource will fail if tables are present."
+  type        = bool
+  default     = null
 }
