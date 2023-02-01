@@ -7,8 +7,6 @@ provider "google" {
 data "google_project" "g-sql-morphic-luminous" {
 }
 
-
-
 # Create the BigQuery dataset
 resource "google_bigquery_dataset" "A_1" {
 
