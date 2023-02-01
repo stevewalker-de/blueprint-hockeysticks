@@ -1,3 +1,18 @@
+# ========================================================
+# Create Scheduled Queries for BigQuery in Google Cloud
+# with Terraform
+# ========================================================
+#
+# This script programmatically creates a Scheduled Query
+# in BigQuery. It contains a workaround for the
+# authentication issues that can occasionally occur
+# when automating the resource creation in GCP.
+#
+# Find more details in this article:
+# https://medium.com/rockedscience/programmatically-create-a-scheduled-query-in-bigquery-with-terraform-2e74634f1af0
+
+
+
 # --------------------------------------------------
 # TERRAFORM CONFIGURATION
 # Setting the provider and the project
@@ -38,7 +53,7 @@ resource "time_sleep" "wait_for_settings_propagation" {
   # and service accounts to propagate. Experiment
   # with this value until you find a time that is
   # consistently working for all the deployments.
-  create_duration = "60s"
+  create_duration = "300s"
 
   depends_on = [
     google_project_service.dts,
