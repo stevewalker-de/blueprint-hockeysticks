@@ -2,7 +2,7 @@
 # VARIABLES
 # Set these before applying the configuration
 # --------------------------------------------------
-variable project_ID {
+variable project_id {
   type        = string
   description = "Google Cloud Project ID"
 }
