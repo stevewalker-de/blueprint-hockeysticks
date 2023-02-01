@@ -26,7 +26,7 @@ resource "google_bigquery_table" "nyc" {
     source_uris = ["gs://steveswalker-morphic/NYC/new_york_taxi_trips-*.csv"]
   }
 }
-
+#comment
 resource "google_bigquery_table" "nyc2" {
   dataset_id = google_bigquery_dataset.A_1.dataset_id
   table_id   = "nyc2"
@@ -36,4 +36,4 @@ resource "google_bigquery_table" "nyc2" {
     source_format = "CSV"
     source_uris = ["gs://steveswalker-morphic/NYC/new_york_taxi_trips-*.csv"]
   }
-}
+} 
