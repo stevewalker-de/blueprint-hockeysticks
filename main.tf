@@ -1,22 +1,3 @@
-# ========================================================
-# Create Scheduled Queries for BigQuery in Google Cloud
-# with Terraform
-# ========================================================
-#
-# This script programmatically creates a Scheduled Query
-# in BigQuery. It contains a workaround for the
-# authentication issues that can occasionally occur
-# when automating the resource creation in GCP.
-#
-# Find more details in this article:
-# https://medium.com/rockedscience/programmatically-create-a-scheduled-query-in-bigquery-with-terraform-2e74634f1af0
-
-
-
-# --------------------------------------------------
-# TERRAFORM CONFIGURATION
-# Setting the provider and the project
-# --------------------------------------------------
 provider "google" {
   project               = var.gcp_project
   region                = var.gcp_region
@@ -24,53 +5,17 @@ provider "google" {
   user_project_override = true
 }
 
-data "google_project" "project" {
+data "google_project" "g-sql-morphic-luminous" {
 }
 
-# --------------------------------------------------
-# RESOURCES
-# Note the comments below
-# --------------------------------------------------
 
-
-# IAM Permisions
-resource "google_project_iam_member" "bigquery_scheduler_permissions" {
-  project = data.google_project.project.project_id
-  role   = "roles/iam.serviceAccountShortTermTokenMinter"
-  member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
-
-  depends_on = [time_sleep.wait_for_settings_propagation]
-}
-
-resource "google_project_iam_binding" "bigquery_datatransfer_admin" {
-  project = data.google_project.project.project_id
-  role    = "roles/bigquery.admin"
-  members = ["serviceAccount:${google_service_account.bigquery_scheduled_queries.email}"]
-
-  depends_on = [time_sleep.wait_for_settings_propagation]
-}
 
 # Create the BigQuery dataset
-resource "google_bigquery_dataset" "my_dataset" {
-  depends_on = [google_project_iam_member.bigquery_scheduler_permissions]
+resource "google_bigquery_dataset" "A_1" {
 
-  dataset_id    = "my_dataset"
-  friendly_name = "My Dataset"
+  dataset_id    = "A_1"
+  friendly_name = "My A_1"
   description   = "My Dataset with Scheduled Queries"
   location      = var.gcp_region
 }
 
-resource "google_bigquery_data_transfer_config" "query_config" {
-  display_name           = "my-query"
-  location               = var.gcp_region
-  data_source_id         = "scheduled_query"
-  schedule               = "every day 00:00"
-  destination_dataset_id = google_bigquery_dataset.my_dataset.dataset_id
-  params = {
-    destination_table_name_template = "my_table"
-    write_disposition               = "WRITE_TRUNCATE"
-    query                           = "SELECT 1000 as total_users"
-  }
-
-  depends_on = [google_project_iam_member.bigquery_scheduler_permissions]
-}
