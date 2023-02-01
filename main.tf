@@ -15,7 +15,7 @@ resource "google_bigquery_dataset" "A_1" {
   dataset_id    = "A_1"
   friendly_name = "My A_1"
   description   = "My Dataset with Scheduled Queries"
-  location      = var.gcp_region
+  location      = var.region
 }
 
 resource "google_bigquery_table" "nyc" {
