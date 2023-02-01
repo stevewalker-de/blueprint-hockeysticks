@@ -2,17 +2,17 @@
 # VARIABLES
 # Set these before applying the configuration
 # --------------------------------------------------
-variable gcp_project {
+variable project_ID {
   type        = string
   description = "Google Cloud Project ID"
 }
 
-variable gcp_region {
+variable region {
   type        = string
   description = "Google Cloud Region"
 }
 
-variable gcp_zone {
+variable zone {
   type        = string
   description = "Google Cloud Zone"
 }

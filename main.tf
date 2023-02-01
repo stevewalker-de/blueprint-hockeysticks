@@ -1,6 +1,6 @@
 provider "google" {
-  project               = var.gcp_project
-  region                = var.gcp_region
+  project               = var.project_id
+  region                = var.region
   user_project_override = true
 }
 
@@ -28,4 +28,3 @@ resource "google_bigquery_table" "nyc" {
     source_uris = ["gs://steveswalker-morphic/NYC/new_york_taxi_trips-*.csv"]
   }
 }
-#  zone                  = var.gcp_zone
