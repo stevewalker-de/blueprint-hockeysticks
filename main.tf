@@ -32,34 +32,6 @@ data "google_project" "project" {
 # Note the comments below
 # --------------------------------------------------
 
-# Enable Data Transfer Service
-resource "google_project_service" "dts" {
-  project                    = data.google_project.project.project_id
-  service                    = "bigquerydatatransfer.googleapis.com"
-  disable_dependent_services = false
-  disable_on_destroy         = false
-}
-
-# Service Account
-resource "google_service_account" "bigquery_scheduled_queries" {
-  account_id   = "bigquery-scheduled-queries"
-  display_name = "BigQuery Scheduled Queries Service Account"
-  description  = "Used to run BigQuery Data Transfer jobs."
-}
-
-# Wait for the new Services and Service Accounts settings to propagate
-resource "time_sleep" "wait_for_settings_propagation" {
-  # It can take a while for the enabled services
-  # and service accounts to propagate. Experiment
-  # with this value until you find a time that is
-  # consistently working for all the deployments.
-  create_duration = "300s"
-
-  depends_on = [
-    google_project_service.dts,
-    google_service_account.bigquery_scheduled_queries
-  ]
-}
 
 # IAM Permisions
 resource "google_project_iam_member" "bigquery_scheduler_permissions" {
