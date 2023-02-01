@@ -38,7 +38,7 @@ resource "time_sleep" "wait_for_settings_propagation" {
   # and service accounts to propagate. Experiment
   # with this value until you find a time that is
   # consistently working for all the deployments.
-  create_duration = "300s"
+  create_duration = "60s"
 
   depends_on = [
     google_project_service.dts,
