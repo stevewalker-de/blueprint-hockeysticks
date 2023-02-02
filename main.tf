@@ -41,7 +41,7 @@ resource "google_bigquery_table" "LAS2" {
 
 resource "google_notebooks_instance" "basic_instance" {
   project                = var.project_id
-  name                   = "edw-notebook-intro-airmj_2"
+  name                   = "edw-notebook-intro-airmj2"
   provider               = google
   location               = "us-east1-b"
   machine_type           = "n1-standard-4"
