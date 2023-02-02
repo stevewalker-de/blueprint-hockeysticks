@@ -8,17 +8,17 @@ data "google_project" "g-sql-morphic-luminous" {
 }
 
 # Create the BigQuery dataset
-resource "google_bigquery_dataset" "thurs_1" {
+resource "google_bigquery_dataset" "A_DS_LAS" {
 
-  dataset_id    = "thurs_1"
-  friendly_name = "My thurs_1"
+  dataset_id    = "thurs_2"
+  friendly_name = "My thurs_2"
   description   = "My Dataset with Scheduled Queries"
   location      = var.region
 }
 
-resource "google_bigquery_table" "ATL1" {
-  dataset_id = google_bigquery_dataset.thurs_1.dataset_id
-  table_id   = "ATL1"
+resource "google_bigquery_table" "LAS1" {
+  dataset_id = google_bigquery_dataset.thurs_2.dataset_id
+  table_id   = "LAS1"
 
   external_data_configuration {
     autodetect    = true
@@ -27,9 +27,9 @@ resource "google_bigquery_table" "ATL1" {
   }
 }
 
-resource "google_bigquery_table" "ATL2" {
+resource "google_bigquery_table" "LAS2" {
   dataset_id = google_bigquery_dataset.thurs_1.dataset_id
-  table_id   = "ATL2"
+  table_id   = "LAS2"
 
   external_data_configuration {
     autodetect    = true
@@ -41,7 +41,7 @@ resource "google_bigquery_table" "ATL2" {
 
 resource "google_notebooks_instance" "basic_instance" {
   project                = var.project_id
-  name                   = "edw-notebook-intro-airmj"
+  name                   = "edw-notebook-intro-airmj_2"
   provider               = google
   location               = "us-east1-b"
   machine_type           = "n1-standard-4"
