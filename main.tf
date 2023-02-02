@@ -17,7 +17,7 @@ resource "google_bigquery_dataset" "A_DS_LAS" {
 }
 
 resource "google_bigquery_table" "LAS1" {
-  dataset_id = google_bigquery_dataset.thurs_2.dataset_id
+  dataset_id = google_bigquery_dataset.A_DS_LAS.dataset_id
   table_id   = "LAS1"
 
   external_data_configuration {
@@ -28,7 +28,7 @@ resource "google_bigquery_table" "LAS1" {
 }
 
 resource "google_bigquery_table" "LAS2" {
-  dataset_id = google_bigquery_dataset.thurs_1.dataset_id
+  dataset_id = google_bigquery_dataset.A_DS_LAS.dataset_id
   table_id   = "LAS2"
 
   external_data_configuration {
