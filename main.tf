@@ -40,15 +40,21 @@ resource "google_bigquery_table" "ATL2" {
 
 
 resource "google_notebooks_instance" "basic_instance" {
-  project      = var.project_id
-  name         = "edw-notebook-intro"
-  provider     = google
-  location     = "us-east1-b"
-  machine_type = "n1-standard-4"
+  project                = var.project_id
+  name                   = "edw-notebook-intro-airmj"
+  provider               = google
+  location               = "us-east1-b"
+  machine_type           = "n1-standard-4"
+  post_startup_script    = "gs://solutions_terraform_assets_da/notebook_startup_script.sh"
 
-  vm_image {
+    vm_image {
     project      = "deeplearning-platform-release"
     image_family = "common-cpu-notebooks-debian-10"
+
+
   }
 
 }
+
+
+
