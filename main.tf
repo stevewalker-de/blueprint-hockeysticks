@@ -7,6 +7,11 @@ provider "google" {
 data "google_project" "steveswalker-sandbox" {
 }
 
+#random id
+resource "random_id" "id" {
+	  byte_length = 4
+}
+
 # Create the BigQuery dataset
 resource "google_bigquery_dataset" "ds_edw" {
 
@@ -23,7 +28,7 @@ resource "google_bigquery_table" "tbl_edw_taxi" {
   external_data_configuration {
     autodetect    = true
     source_format = "CSV"
-    source_uris = ["gs://solution-data-taxi-trips/taxi-*.csv"]
+    source_uris = ["gs://solution-data-taxi-trips/taxi-*.Parquet"]
     
   }
 }
@@ -31,7 +36,7 @@ resource "google_bigquery_table" "tbl_edw_taxi" {
 
 resource "google_notebooks_instance" "basic_instance" {
   project                = var.project_id
-  name                   = "edw-notebook-intro-0204v2"
+  name                   = "edw-notbook-${random_id.id.hex}"
   provider               = google
   location               = "us-east1-b"
   machine_type           = "n1-standard-4"
