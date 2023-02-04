@@ -23,7 +23,8 @@ resource "google_bigquery_table" "tbl_edw_taxi" {
   external_data_configuration {
     autodetect    = true
     source_format = "CSV"
-    source_uris = ["gs://solution-data-taxi-trips/new_york_taxi_trips-*.csv"]
+    source_uris = ["gs://solution-data-taxi-trips/taxi-*.csv"]
+    
   }
 }
 
