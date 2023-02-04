@@ -30,7 +30,7 @@ resource "google_bigquery_table" "tbl_edw_taxi" {
 
 resource "google_notebooks_instance" "basic_instance" {
   project                = var.project_id
-  name                   = "edw-notebook-intro-0204v1"
+  name                   = "edw-notebook-intro-0204v2"
   provider               = google
   location               = "us-east1-b"
   machine_type           = "n1-standard-4"
