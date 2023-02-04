@@ -4,7 +4,7 @@ provider "google" {
   user_project_override = true
 }
 
-data "google_project" "g-sql-morphic-luminous" {
+data "google_project" "steveswalker-sandbox" {
 }
 
 # Create the BigQuery dataset
