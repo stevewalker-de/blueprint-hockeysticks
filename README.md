@@ -5,11 +5,16 @@
 This is an auto-generated module.
 
 ### detailed
-This module was generated from [terraform-google-module-template](https://github.com/terraform-google-modules/terraform-google-module-template/), which by default generates a module that simply creates a GCS bucket. As the module develops, this README should be updated.
 
 The resources/services/activations/deletions that this module will create/trigger are:
 
-- Create a GCS bucket with the provided name
+- Creates a BQ Dataset
+- Creates a BQ Table
+- Creates a GCS bucket 
+- Loads the GCS bucket with data from https://pantheon.corp.google.com/marketplace/product/city-of-new-york/nyc-tlc-trips
+- Provides SQL examples
+- Creates and inferences with a BigQuery ML model
+- Creates a datastudio report
 
 ### preDeploy
 To deploy this blueprint you must have an active billing account and billing permissions.
@@ -18,18 +23,6 @@ To deploy this blueprint you must have an active billing account and billing per
 - [Hosting a Static Website](https://cloud.google.com/storage/docs/hosting-static-website)
 
 ## Usage
-
-Basic usage of this module is as follows:
-
-```hcl
-module "ssw" {
-  source  = "terraform-google-modules/ssw/google"
-  version = "~> 0.1"
-
-  project_id  = "<PROJECT ID>"
-  bucket_name = "gcs-test-bucket"
-}
-```
 
 Functional examples are included in the
 [examples](./examples/) directory.
@@ -82,15 +75,6 @@ resources of this module:
 The [Project Factory module][project-factory-module] can be used to
 provision a project with the necessary APIs enabled.
 
-## Contributing
-
-Refer to the [contribution guidelines](./CONTRIBUTING.md) for
-information on contributing to this module.
-
-[iam-module]: https://registry.terraform.io/modules/terraform-google-modules/iam/google
-[project-factory-module]: https://registry.terraform.io/modules/terraform-google-modules/project-factory/google
-[terraform-provider-gcp]: https://www.terraform.io/docs/providers/google/index.html
-[terraform]: https://www.terraform.io/downloads.html
 
 ## Security Disclosures
 
