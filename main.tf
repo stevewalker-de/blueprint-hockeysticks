@@ -267,7 +267,7 @@ resource "google_project_iam_member" "dts_permissions_agent" {
 resource "google_bigquery_data_transfer_config" "query_config" {
   
   display_name           = "nightly-load-query"
-  project                = var.project_id
+  # project                = var.project_id
   location               = var.region
   data_source_id         = "nightly_load_query"
   schedule               = "every day 00:00"
