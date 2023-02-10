@@ -37,9 +37,10 @@ resource "google_project_iam_member" "cloud_function_service_account_editor_role
 resource "google_storage_bucket" "raw_bucket" {
   name          = "ds-edw-raw-${random_id.id.hex}"
   location      = var.region
-  # force_destroy = true
+  uniform_bucket_level_access = true
+  force_destroy = true
 
-  # public_access_prevention = "enforced"
+  public_access_prevention = "enforced"
 }
 
 # # # Set up the provisioning bucketstorage bucket
