@@ -197,52 +197,52 @@ resource "google_storage_bucket_object" "cloud_function_zip_upload" {
     ]  
 }
 
-# # # Create the function
-# resource "google_cloudfunctions2_function" "function" {
-#   #provider = google-beta
-#   project     = var.project_id
-#   name        = "bq-sp-transform-${random_id.id.hex}"
-#   location    = var.region
-#   description = "gcs-load-bq"
+# # Create the function
+resource "google_cloudfunctions2_function" "function" {
+  #provider = google-beta
+  project     = var.project_id
+  name        = "bq-sp-transform-${random_id.id.hex}"
+  location    = var.region
+  description = "gcs-load-bq"
 
-#   build_config {
-#     runtime     = "python310"
-#     entry_point = "bq_sp_transform"
-#     source {
-#       storage_source {
-#         bucket = google_storage_bucket.provisioning_bucket.name
-#         object = "bigquery-external-function.zip"
-#       }
-#     }
-#   }
+  build_config {
+    runtime     = "python310"
+    entry_point = "bq_sp_transform"
+    source {
+      storage_source {
+        bucket = google_storage_bucket.provisioning_bucket.name
+        object = "assets/bigquery-external-function.zip"
+      }
+    }
+  }
 
-#   service_config {
-#     max_instance_count = 1
-#     available_memory   = "256M"
-#     timeout_seconds    = 540
-#     environment_variables = {
-#         PROJECT_ID = var.project_id
-#         BUCKET_ID = google_storage_bucket.raw_bucket.name
-#     }
-#     service_account_email = google_service_account.cloud_function_service_account.email
-#   }
+  service_config {
+    max_instance_count = 1
+    available_memory   = "256M"
+    timeout_seconds    = 540
+    environment_variables = {
+        PROJECT_ID = var.project_id
+        BUCKET_ID = google_storage_bucket.raw_bucket.name
+    }
+    service_account_email = google_service_account.cloud_function_service_account.email
+  }
 
-#   event_trigger {
-#     trigger_region = var.region
-#     event_type     = "google.cloud.storage.object.v1.finalized"
-#     event_filters {
-#          attribute = "bucket"
-#          value = google_storage_bucket.raw_bucket.name
-#     }
-#     retry_policy   = "RETRY_POLICY_RETRY"
-#     }
+  event_trigger {
+    trigger_region = var.region
+    event_type     = "google.cloud.storage.object.v1.finalized"
+    event_filters {
+         attribute = "bucket"
+         value = google_storage_bucket.raw_bucket.name
+    }
+    retry_policy   = "RETRY_POLICY_RETRY"
+    }
 
-#   depends_on = [
-#     google_storage_bucket.provisioning_bucket,
-#     google_storage_bucket.raw_bucket,
-#     google_project_iam_member.cloud_function_service_account_editor_role
-#   ]
-# } 
+  depends_on = [
+    google_storage_bucket.provisioning_bucket,
+    google_storage_bucket.raw_bucket,
+    google_project_iam_member.cloud_function_service_account_editor_role
+  ]
+} 
 
 
 
