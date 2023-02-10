@@ -16,16 +16,16 @@ resource "google_service_account" "cloud_function_service_account" {
   display_name = "Service Account for Cloud Function Execution"
 }
 
-# TODO: scope this down
-resource "google_project_iam_member" "cloud_function_service_account_editor_role" {
-  project  = var.project_id
-  role     = "roles/editor"
-  member   = "serviceAccount:${google_service_account.cloud_function_service_account.email}"
+# # TODO: scope this down
+# resource "google_project_iam_member" "cloud_function_service_account_editor_role" {
+#   project  = var.project_id
+#   role     = "roles/editor"
+#   member   = "serviceAccount:${google_service_account.cloud_function_service_account.email}"
 
-  depends_on = [
-    google_service_account.cloud_function_service_account
-  ]
-}
+#   depends_on = [
+#     google_service_account.cloud_function_service_account
+#   ]
+# }
 
 
 # # Set up Storage Buckets
