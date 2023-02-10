@@ -21,7 +21,7 @@ resource "google_service_account" "cloud_function_service_account" {
 resource "google_project_iam_member" "cloud_function_service_account_editor_role" {
   project  = var.project_id
   role     = "roles/editor"
-  member   = "serviceAccount:${google_service_account.cloud_function_service_account.email}"
+  member   = google_service_account.cloud_function_service_account.member
 
   depends_on = [
     google_service_account.cloud_function_service_account
