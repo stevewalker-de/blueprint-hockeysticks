@@ -93,3 +93,7 @@ SELECT TaxiCompany,
 SELECT *
   FROM PercentChange
 ORDER BY GroupPartition;
+
+CREATE OR REPLACE VIEW `${project_id}.ds_edw.vwlookerstudio_report` as 
+SELECT * FROM `${project_id}.ds_edw.lookerstudio_report` 
+WHERE Year in (2021);

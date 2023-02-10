@@ -1,11 +1,5 @@
-provider "google" {
-  project               = var.project_id
-  region                = var.region
-  zone                  = var.zone
-  user_project_override = true
-}
-
-provider "random" {
+data "google_project" "project" {
+  project_id = var.project_id
 }
 
 #random id
@@ -95,7 +89,7 @@ resource "google_storage_bucket_object" "parquet_files" {
 # # Create a BigQuery external table
 resource "google_bigquery_table" "tbl_edw_taxi" {
   dataset_id = google_bigquery_dataset.ds_edw.dataset_id
-  table_id   = "tbl_edw_taxi"
+  table_id   = "taxi_trips"
 
   external_data_configuration {
     autodetect    = true
@@ -136,25 +130,25 @@ resource "google_bigquery_routine" "sproc_sp_demo_datastudio_report" {
   ]
 }
 
-# # Add Sample Queries
-# data "template_file" "sp_sample_queries" {
-#   template = "${file("../sql-scripts/taxi_dataset/sp_demo_datastudio_report.sql")}"
-#   vars = {
-#     project_id = var.project_id
-#   }  
-# }
-# resource "google_bigquery_routine" "sp_sample_queries" {
-#   dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
-#   routine_id      = "sp_sample_queries"
-#   routine_type    = "PROCEDURE"
-#   language        = "SQL"
-#   definition_body = "${data.template_file.sp_sample_queries.rendered}"
+# Add Sample Queries
+data "template_file" "sp_sample_queries" {
+  template = "${file("assets/sql/sp_sample_queries.sql")}"
+  vars = {
+    project_id = var.project_id
+  }  
+}
+resource "google_bigquery_routine" "sp_sample_queries" {
+  dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
+  routine_id      = "sp_sample_queries"
+  routine_type    = "PROCEDURE"
+  language        = "SQL"
+  definition_body = "${data.template_file.sp_sample_queries.rendered}"
 
-#   depends_on = [
-#     google_bigquery_table.tbl_edw_taxi,
-#     data.template_file.sp_sample_queries
-#   ]
-# }
+  depends_on = [
+    google_bigquery_table.tbl_edw_taxi,
+    data.template_file.sp_sample_queries
+  ]
+}
 
 # TODO: Add view to scope data duration for better charting
 
