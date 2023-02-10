@@ -86,8 +86,8 @@ resource "google_project_iam_member" "bq_connection_iam_object_viewer" {
 resource "google_storage_bucket_object" "parquet_files" {
   for_each = fileset("assets/parquet/", "*")
 
-  bucket = google_storage_bucket.raw_bucket
-  name   = "${each.value}"
+  bucket = google_storage_bucket.raw_bucket.name
+  name   = each.value
   source = "assets/parquet/${each.value}"
 
 }
@@ -156,6 +156,9 @@ resource "google_bigquery_table" "tbl_edw_taxi" {
 #   ]
 # }
 
+# TODO: Add ML Query Upload, add to cloud function
+
+# TODO: Add translator
 
 # Notebooks instance
 # resource "google_notebooks_instance" "basic_instance" {
@@ -247,7 +250,7 @@ resource "google_cloudfunctions2_function" "function" {
 
 
 # resource "google_storage_bucket_object" "startfile" {
-#   bucket = google_storage_bucket.raw_bucket
+#   bucket = google_storage_bucket.raw_bucket.name
 #   name   = "startfile"
 #   source = "assets/startfile"
 
