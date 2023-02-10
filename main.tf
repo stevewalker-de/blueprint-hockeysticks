@@ -28,15 +28,15 @@ resource "google_project_iam_member" "cloud_function_service_account_editor_role
 }
 
 
-# Set up Storage Buckets
-# # Set up the raw storage bucket
-resource "google_storage_bucket" "raw_bucket" {
-  name          = "ds-edw-raw-${random_id.id.hex}"
-  location      = var.region
-  force_destroy = true
+# # Set up Storage Buckets
+# # # Set up the raw storage bucket
+# resource "google_storage_bucket" "raw_bucket" {
+#   name          = "ds-edw-raw-${random_id.id.hex}"
+#   location      = var.region
+#   force_destroy = true
 
-  public_access_prevention = "enforced"
-}
+#   public_access_prevention = "enforced"
+# }
 
 # # # Set up the provisioning bucketstorage bucket
 # resource "google_storage_bucket" "provisioning_bucket" {
