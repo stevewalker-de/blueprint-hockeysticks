@@ -274,7 +274,7 @@ resource "google_bigquery_data_transfer_config" "dts_config" {
   params = {
     destination_table_name_template = "my_table"
     write_disposition               = "WRITE_TRUNCATE"
-    query                           = "SELECT 1 as value_int" # "CALL `${var.project_id}.ds_edw.sp_lookerstudio_report`()"
+    query                           = "CALL `${var.project_id}.ds_edw.sp_lookerstudio_report`()"
   }
 
   depends_on = [
