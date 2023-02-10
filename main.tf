@@ -90,7 +90,7 @@ resource "google_storage_bucket_object" "parquet_files" {
 resource "google_bigquery_table" "tbl_edw_taxi" {
   dataset_id = "ds_edw" # google_bigquery_dataset.ds_edw.dataset_id
   table_id   = "taxi_trips"
-  deletion_protection = false 
+  # deletion_protection = false 
 
   external_data_configuration {
     autodetect    = true
@@ -102,8 +102,7 @@ resource "google_bigquery_table" "tbl_edw_taxi" {
 
   depends_on = [
     google_bigquery_connection.ds_connection,
-    google_storage_bucket.raw_bucket,
-    google_storage_bucket_object.parquet_files
+    google_storage_bucket.raw_bucket
   ]
 }
 
