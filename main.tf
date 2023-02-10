@@ -116,25 +116,25 @@ resource "google_bigquery_table" "tbl_edw_taxi" {
 
 
 
-# # Add Looker Studio Data Report Procedure
-# data "template_file" "sp_lookerstudio_report" {
-#   template = "${file("assets/sql/sp_lookerstudio_report.sql")}"
-#   vars = {
-#     project_id = var.project_id
-#   }  
-# }
-# resource "google_bigquery_routine" "sproc_sp_demo_datastudio_report" {
-#   dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
-#   routine_id      = "sp_lookerstudio_report"
-#   routine_type    = "PROCEDURE"
-#   language        = "SQL"
-#   definition_body = "${data.template_file.sp_lookerstudio_report.rendered}"
+# Add Looker Studio Data Report Procedure
+data "template_file" "sp_lookerstudio_report" {
+  template = "${file("assets/sql/sp_lookerstudio_report.sql")}"
+  vars = {
+    project_id = var.project_id
+  }  
+}
+resource "google_bigquery_routine" "sproc_sp_demo_datastudio_report" {
+  dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
+  routine_id      = "sp_lookerstudio_report"
+  routine_type    = "PROCEDURE"
+  language        = "SQL"
+  definition_body = "${data.template_file.sp_lookerstudio_report.rendered}"
 
-#   depends_on = [
-#     google_bigquery_table.tbl_edw_taxi,
-#     data.template_file.sp_lookerstudio_report
-#   ]
-# }
+  depends_on = [
+    google_bigquery_table.tbl_edw_taxi,
+    data.template_file.sp_lookerstudio_report
+  ]
+}
 
 # # Add Sample Queries
 # data "template_file" "sp_sample_queries" {
@@ -155,6 +155,8 @@ resource "google_bigquery_table" "tbl_edw_taxi" {
 #     data.template_file.sp_sample_queries
 #   ]
 # }
+
+# TODO: Add view to scope data duration for better charting
 
 # TODO: Add ML Query Upload, add to cloud function
 
