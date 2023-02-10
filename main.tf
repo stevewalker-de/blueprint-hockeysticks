@@ -84,11 +84,11 @@ resource "google_project_iam_member" "bq_connection_iam_object_viewer" {
 
 # # Upload files
 resource "google_storage_bucket_object" "parquet_files" {
-  for_each = fileset(path.module, "assets/parquet/*")
+  for_each = fileset("assets/parquet/", "*")
 
   bucket = google_storage_bucket.raw_bucket
   name   = each.key
-  source = each.key
+  source = "assets/parquet/${each.key}"
 
 }
 
