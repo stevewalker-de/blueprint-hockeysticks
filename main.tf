@@ -265,15 +265,15 @@ resource "google_project_iam_member" "dts_permissions_agent" {
 # Set up scheduled query
 resource "google_bigquery_data_transfer_config" "query_config" {
   
-  display_name           = "nightly-load-query"
+  display_name           = "nightlyloadquery"
   project                = var.project_id
   location               = var.region
-  data_source_id         = "nightly_load_query"
+  data_source_id         = "nightlyloadquery"
   schedule               = "every day 00:00"
   destination_dataset_id = google_bigquery_dataset.ds_edw.dataset_id
   params = {
     destination_table_name_template = "my_table"
-    write_disposition               = "OVERWRITE"
+    write_disposition               = "WRITE_TRUNCATE"
     query                           = "SELECT 1 as value_int" # "CALL `${var.project_id}.ds_edw.sp_lookerstudio_report`()"
   }
 
