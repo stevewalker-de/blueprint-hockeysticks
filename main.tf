@@ -263,12 +263,12 @@ resource "google_project_iam_member" "dts_permissions_agent" {
 }
 
 # Set up scheduled query
-resource "google_bigquery_data_transfer_config" "query_config" {
+resource "google_bigquery_data_transfer_config" "dts_config" {
   
   display_name           = "nightlyloadquery"
   project                = var.project_id
   location               = var.region
-  data_source_id         = "nightlyloadquery"
+  data_source_id         = "scheduled_query"
   schedule               = "every day 00:00"
   destination_dataset_id = google_bigquery_dataset.ds_edw.dataset_id
   params = {
