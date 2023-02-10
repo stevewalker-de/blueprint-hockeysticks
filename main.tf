@@ -30,6 +30,7 @@ resource "google_project_iam_member" "cloud_function_service_account_editor_role
 # # Set up the raw storage bucket
 resource "google_storage_bucket" "raw_bucket" {
   name          = "ds-edw-raw-${random_id.id.hex}"
+  project     = var.project_id
   location      = var.region
   uniform_bucket_level_access = true
   force_destroy = true
@@ -40,6 +41,7 @@ resource "google_storage_bucket" "raw_bucket" {
 # # Set up the provisioning bucketstorage bucket
 resource "google_storage_bucket" "provisioning_bucket" {
   name          = "ds-edw-provisioner-${random_id.id.hex}"
+  project     = var.project_id
   location      = var.region
   uniform_bucket_level_access = true
   force_destroy = true
@@ -50,7 +52,7 @@ resource "google_storage_bucket" "provisioning_bucket" {
 # Set up BigQuery resources
 # # Create the BigQuery dataset
 resource "google_bigquery_dataset" "ds_edw" {
-
+  project     = var.project_id
   dataset_id    = "ds_edw"
   friendly_name = "My EDW Dataset"
   description   = "My EDW Dataset with tables"
@@ -59,6 +61,7 @@ resource "google_bigquery_dataset" "ds_edw" {
 
 # # Create a BigQuery connection
 resource "google_bigquery_connection" "ds_connection" {
+   project     = var.project_id
    connection_id = "ds_connection"
    location      = var.region
    friendly_name = "Storage Bucket Connection"
@@ -120,6 +123,7 @@ data "template_file" "sp_lookerstudio_report" {
   }  
 }
 resource "google_bigquery_routine" "sproc_sp_demo_datastudio_report" {
+  project     = var.project_id
   dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
   routine_id      = "sp_lookerstudio_report"
   routine_type    = "PROCEDURE"
@@ -140,6 +144,7 @@ data "template_file" "sp_sample_queries" {
   }  
 }
 resource "google_bigquery_routine" "sp_sample_queries" {
+  project     = var.project_id
   dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
   routine_id      = "sp_sample_queries"
   routine_type    = "PROCEDURE"
