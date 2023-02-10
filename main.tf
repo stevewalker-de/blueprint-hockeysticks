@@ -82,35 +82,35 @@ resource "google_project_iam_member" "bq_connection_iam_object_viewer" {
   ]
 }
 
-# # # Upload files
-# resource "google_storage_bucket_object" "parquet_files" {
-#   for_each = fileset(path.module, "assets/parquet/*")
+# # Upload files
+resource "google_storage_bucket_object" "parquet_files" {
+  for_each = fileset(path.module, "assets/parquet/*")
 
-#   bucket = google_storage_bucket.raw_bucket
-#   name   = each.value
-#   source = "assets/parquet/${each.value}"
+  bucket = google_storage_bucket.raw_bucket
+  name   = each.value
+  source = "assets/parquet/${each.value}"
 
-# }
+}
 
-# # # Create a BigQuery external table
-# resource "google_bigquery_table" "tbl_edw_taxi" {
-#   dataset_id = google_bigquery_dataset.ds_edw.dataset_id
-#   table_id   = "tbl_edw_taxi"
+# # Create a BigQuery external table
+resource "google_bigquery_table" "tbl_edw_taxi" {
+  dataset_id = google_bigquery_dataset.ds_edw.dataset_id
+  table_id   = "tbl_edw_taxi"
 
-#   external_data_configuration {
-#     autodetect    = true
-#     connection_id = "${var.project_id}.${var.region}.ds_connection"
-#     source_format = "CSV"
-#     source_uris = ["gs://${google_storage_bucket.raw_bucket.name}/taxi-*.Parquet"]
+  external_data_configuration {
+    autodetect    = true
+    connection_id = "${var.project_id}.${var.region}.ds_connection"
+    source_format = "PARQUET"
+    source_uris = ["gs://${google_storage_bucket.raw_bucket.name}/taxi-*.Parquet"]
     
-#   }
+  }
 
-#   depends_on = [
-#     google_bigquery_connection.ds_connection,
-#     google_storage_bucket.raw_bucket,
-#     google_storage_bucket_object.parquet_files
-#   ]
-# }
+  depends_on = [
+    google_bigquery_connection.ds_connection,
+    google_storage_bucket.raw_bucket,
+    google_storage_bucket_object.parquet_files
+  ]
+}
 
 # # TODO: Add Payment Type and Vendor Type Tables
 
