@@ -13,7 +13,7 @@ resource "random_id" "id" {
 # Set up service account for the Cloud Function to execute as
 resource "google_service_account" "cloud_function_service_account" {
   project      = var.project_id
-  account_id   = "cloud-function-service-account"
+  account_id   = "cloud-function-service-account-${random_id.id.hex}"
   display_name = "Service Account for Cloud Function Execution"
 }
 
