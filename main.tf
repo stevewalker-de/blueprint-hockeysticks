@@ -262,27 +262,27 @@ resource "google_project_iam_member" "dts_permissions_agent" {
   member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
 }
 
-resource "google_project_iam_member" "dts_permissions_bigquery" {
-  project = data.google_project.project.project_id
-  role   = "roles/bigquery.Admin"
-  member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
-}
+module "scheduled_queries" {
+  source = "terraform-google-modules/bigquery/google//modules/scheduled_queries"
+  version = "~> 5.3.0"
 
+  project_id = module.dataset.bigquery_dataset.project_id
 
-# # Set up scheduled query
-resource "google_bigquery_data_transfer_config" "query_config" {
-  
-  display_name           = "nightly-load-query"
-  project                = var.project_id
-  location               = var.region
-  data_source_id         = "nightly_load_query"
-  schedule               = "every day 00:00"
-  destination_dataset_id = google_bigquery_dataset.ds_edw.dataset_id
-  params = {
-    destination_table_name_template = "lookerstudio_report"
-    write_disposition               = "OVERWRITE"
-    query                           = "CALL `${var.project_id}.ds_edw.sp_lookerstudio_report`()"
-  }
+  queries = [
+    {
+      name                   = "my-query"
+      project                 = var.project_id
+      location               = var.region
+      data_source_id         = "scheduled_query"
+      destination_dataset_id = google_bigquery_dataset.ds_edw.dataset_id
+      schedule               = "every day 00:00"
+      params = {
+        destination_table_name_template = "my_table"
+        write_disposition               = "WRITE_APPEND"
+        query                           = "CALL `${var.project_id}.ds_edw.sp_lookerstudio_report`()"
+      }
+    }
+  ]
 
   depends_on = [
     google_project_iam_member.dts_permissions_token,
@@ -290,6 +290,27 @@ resource "google_bigquery_data_transfer_config" "query_config" {
     google_bigquery_dataset.ds_edw
   ]
 }
+# # Set up scheduled query
+# resource "google_bigquery_data_transfer_config" "query_config" {
+  
+#   display_name           = "nightly-load-query"
+#   project                = var.project_id
+#   location               = var.region
+#   data_source_id         = "nightly_load_query"
+#   schedule               = "every day 00:00"
+#   destination_dataset_id = google_bigquery_dataset.ds_edw.dataset_id
+#   params = {
+#     destination_table_name_template = "lookerstudio_report"
+#     write_disposition               = "OVERWRITE"
+#     query                           = "CALL `${var.project_id}.ds_edw.sp_lookerstudio_report`()"
+#   }
+
+#   depends_on = [
+#     google_project_iam_member.dts_permissions_token,
+#     google_project_iam_member.dts_permissions_agent,
+#     google_bigquery_dataset.ds_edw
+#   ]
+# }
 
 # Notebooks instance
 # resource "google_notebooks_instance" "basic_instance" {
