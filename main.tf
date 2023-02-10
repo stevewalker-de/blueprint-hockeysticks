@@ -148,7 +148,7 @@ resource "google_project_iam_member" "bq_connection_iam_object_viewer" {
 #     google_bigquery_table.tbl_edw_taxi,
 #     data.template_file.sp_sample_queries
 #   ]
-}
+# }
 
 
 # Notebooks instance
