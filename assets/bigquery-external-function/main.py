@@ -30,7 +30,11 @@ def bq_sp_transform(cloud_event):
 
     client = bigquery.Client()
 
-    query_string = f"CALL `{PROJECT_ID}.ds_edw.sp_looker_studio_report`();"
+    query_string = f"""
+        CALL `{PROJECT_ID}.ds_edw.sp_provision_lookup_tables`();
+        CALL `{PROJECT_ID}.ds_edw.sp_lookerstudio_report`();
+        CALL `{PROJECT_ID}.ds_edw.sp_bigqueryml_model`();
+        """
     query_job = client.query(query_string)
 
     query_job.result()

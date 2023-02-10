@@ -94,6 +94,6 @@ SELECT *
   FROM PercentChange
 ORDER BY GroupPartition;
 
-CREATE OR REPLACE VIEW `${project_id}.ds_edw.vwlookerstudio_report` as 
+CREATE OR REPLACE VIEW `${project_id}.ds_edw.vw_lookerstudio_report` as 
 SELECT * FROM `${project_id}.ds_edw.lookerstudio_report` 
 WHERE Year in (2021);

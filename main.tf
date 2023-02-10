@@ -111,11 +111,30 @@ resource "google_bigquery_table" "tbl_edw_taxi" {
   ]
 }
 
-# # TODO: Add Payment Type and Vendor Type Tables
+# Load Queries for Stored Procedure Execution
+# # Load Lookup Data Tables
+data "template_file" "sp_provision_lookup_tables" {
+  template = "${file("assets/sql/sp_provision_lookup_tables.sql")}"
+  vars = {
+    project_id = var.project_id
+  }  
+}
+resource "google_bigquery_routine" "sp_provision_lookup_tables" {
+  project     = var.project_id
+  dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
+  routine_id      = "sp_provision_lookup_tables"
+  routine_type    = "PROCEDURE"
+  language        = "SQL"
+  definition_body = "${data.template_file.sp_provision_lookup_tables.rendered}"
+
+  depends_on = [
+    google_bigquery_dataset.ds_edw,
+    data.template_file.sp_provision_lookup_tables
+  ]
+}
 
 
-
-# Add Looker Studio Data Report Procedure
+# # Add Looker Studio Data Report Procedure
 data "template_file" "sp_lookerstudio_report" {
   template = "${file("assets/sql/sp_lookerstudio_report.sql")}"
   vars = {
@@ -136,7 +155,7 @@ resource "google_bigquery_routine" "sproc_sp_demo_datastudio_report" {
   ]
 }
 
-# Add Sample Queries
+# # Add Sample Queries
 data "template_file" "sp_sample_queries" {
   template = "${file("assets/sql/sp_sample_queries.sql")}"
   vars = {
@@ -158,9 +177,50 @@ resource "google_bigquery_routine" "sp_sample_queries" {
 }
 
 
-# TODO: Add ML Query Upload, add to cloud function
+# # Add Bigquery ML ModelTODO: Add ML Query Upload, add to cloud function
+# # TODO: Get Model Code from Steve
+data "template_file" "sp_bigqueryml_model" {
+  template = "${file("assets/sql/sp_bigqueryml_model.sql")}"
+  vars = {
+    project_id = var.project_id
+  }  
+}
+resource "google_bigquery_routine" "sp_bigqueryml_model" {
+  project     = var.project_id
+  dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
+  routine_id      = "sp_bigqueryml_model"
+  routine_type    = "PROCEDURE"
+  language        = "SQL"
+  definition_body = "${data.template_file.sp_bigqueryml_model.rendered}"
 
-# TODO: Add translator
+  depends_on = [
+    google_bigquery_table.tbl_edw_taxi,
+    data.template_file.sp_bigqueryml_model
+  ]
+}
+
+# # Add Translation Scripts
+# # TODO: Get translation Code from Mohit
+data "template_file" "sp_sample_translation_queries" {
+  template = "${file("assets/sql/sp_sample_translation_queries.sql")}"
+  vars = {
+    project_id = var.project_id
+  }  
+}
+resource "google_bigquery_routine" "sp_sample_translation_queries" {
+  project     = var.project_id
+  dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
+  routine_id      = "sp_sample_translation_queries"
+  routine_type    = "PROCEDURE"
+  language        = "SQL"
+  definition_body = "${data.template_file.sp_sample_translation_queries.rendered}"
+
+  depends_on = [
+    google_bigquery_table.tbl_edw_taxi,
+    data.template_file.sp_sample_translation_queries
+  ]
+}
+
 
 # Notebooks instance
 # resource "google_notebooks_instance" "basic_instance" {
