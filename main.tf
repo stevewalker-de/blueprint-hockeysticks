@@ -20,7 +20,7 @@ resource "google_service_account" "cloud_function_service_account" {
 resource "google_project_iam_member" "cloud_function_service_account_editor_role" {
   project  = var.project_id
   role     = "roles/editor"
-  member   = "serviceAccount:${google_service_account.cloud_function.email}"
+  member   = "serviceAccount:${google_service_account.cloud_function_service_account.email}"
 
   depends_on = [
     google_service_account.cloud_function_service_account
@@ -126,7 +126,7 @@ resource "google_bigquery_routine" "sproc_sp_demo_datastudio_report" {
 
   depends_on = [
     google_bigquery_table.tbl_edw_taxi,
-    data.template_file.sp_sample_queries
+    data.template_file.sp_lookerstudio_report
   ]
 }
 
