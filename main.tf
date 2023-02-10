@@ -311,13 +311,13 @@ resource "google_cloudfunctions2_function" "function" {
 
 
 
-# resource "google_storage_bucket_object" "startfile" {
-#   bucket = google_storage_bucket.raw_bucket.name
-#   name   = "startfile"
-#   source = "assets/startfile"
+resource "google_storage_bucket_object" "startfile" {
+  bucket = google_storage_bucket.raw_bucket.name
+  name   = "startfile"
+  source = "assets/startfile"
 
-#   depends_on = [
-#     google_cloudfunctions2_function.function
-#   ]
+  depends_on = [
+    google_cloudfunctions2_function.function
+  ]
 
-# }
+}
