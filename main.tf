@@ -17,36 +17,36 @@ resource "google_service_account" "cloud_function_service_account" {
   display_name = "Service Account for Cloud Function Execution"
 }
 
-# # TODO: scope this down
-# resource "google_project_iam_member" "cloud_function_service_account_editor_role" {
-#   project  = var.project_id
-#   role     = "roles/editor"
-#   member   = "serviceAccount:${google_service_account.cloud_function_service_account.email}"
+# TODO: scope this down
+resource "google_project_iam_member" "cloud_function_service_account_editor_role" {
+  project  = var.project_id
+  role     = "roles/editor"
+  member   = "serviceAccount:${google_service_account.cloud_function_service_account.email}"
 
-#   depends_on = [
-#     google_service_account.cloud_function_service_account
-#   ]
-# }
+  depends_on = [
+    google_service_account.cloud_function_service_account
+  ]
+}
 
 
-# # Set up Storage Buckets
-# # # Set up the raw storage bucket
-# resource "google_storage_bucket" "raw_bucket" {
-#   name          = "ds-edw-raw-${random_id.id.hex}"
-#   location      = var.region
-#   force_destroy = true
+# Set up Storage Buckets
+# # Set up the raw storage bucket
+resource "google_storage_bucket" "raw_bucket" {
+  name          = "ds-edw-raw-${random_id.id.hex}"
+  location      = var.region
+  force_destroy = true
 
-#   public_access_prevention = "enforced"
-# }
+  public_access_prevention = "enforced"
+}
 
-# # # Set up the provisioning bucketstorage bucket
-# resource "google_storage_bucket" "provisioning_bucket" {
-#   name          = "ds-edw-provisioner-${random_id.id.hex}"
-#   location      = var.region
-#   force_destroy = true
+# # Set up the provisioning bucketstorage bucket
+resource "google_storage_bucket" "provisioning_bucket" {
+  name          = "ds-edw-provisioner-${random_id.id.hex}"
+  location      = var.region
+  force_destroy = true
 
-#   public_access_prevention = "enforced"
-# }
+  public_access_prevention = "enforced"
+}
 
 # # Set up BigQuery resources
 # # # Create the BigQuery dataset
