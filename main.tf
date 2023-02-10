@@ -65,16 +65,16 @@ resource "google_bigquery_connection" "ds_connection" {
    cloud_resource {}
 }
 
-# # Grant IAM access to the BigQuery Connection account for Cloud Storage
-resource "google_project_iam_member" "bq_connection_iam_object_viewer" {
-  project  = var.project_id
-  role     = "roles/storage.objectViewer"
-  member   = "serviceAccount:${google_bigquery_connection.ds_connection.cloud_resource[0].service_account_id}"
+# # # Grant IAM access to the BigQuery Connection account for Cloud Storage
+# resource "google_project_iam_member" "bq_connection_iam_object_viewer" {
+#   project  = var.project_id
+#   role     = "roles/storage.objectViewer"
+#   member   = "serviceAccount:${google_bigquery_connection.ds_connection.cloud_resource[0].service_account_id}"
 
-  depends_on = [
-    google_bigquery_connection.ds_connection
-  ]
-}
+#   depends_on = [
+#     google_bigquery_connection.ds_connection
+#   ]
+# }
 
 # # # Upload files
 # resource "google_storage_bucket_object" "parquet_files" {
@@ -167,86 +167,86 @@ resource "google_project_iam_member" "bq_connection_iam_object_viewer" {
 
 # }
 
-# Create a Cloud Function resource
-# # Zip the function file
-data "archive_file" "bigquery_external_function_zip" {
-  type        = "zip"
-  source_dir  = "assets/bigquery-external-function" 
-  output_path = "assets/bigquery-external-function.zip"
+# # Create a Cloud Function resource
+# # # Zip the function file
+# data "archive_file" "bigquery_external_function_zip" {
+#   type        = "zip"
+#   source_dir  = "assets/bigquery-external-function" 
+#   output_path = "assets/bigquery-external-function.zip"
 
-  depends_on = [ 
-    google_storage_bucket.provisioning_bucket
-    ]  
-}
+#   depends_on = [ 
+#     google_storage_bucket.provisioning_bucket
+#     ]  
+# }
 
-# # Place the function file on Cloud Storage
-resource "google_storage_bucket_object" "cloud_function_zip_upload" {
-  name   = "assets/bigquery-external-function.zip"
-  bucket = google_storage_bucket.provisioning_bucket.name
-  source = data.archive_file.bigquery_external_function_zip.output_path
+# # # Place the function file on Cloud Storage
+# resource "google_storage_bucket_object" "cloud_function_zip_upload" {
+#   name   = "assets/bigquery-external-function.zip"
+#   bucket = google_storage_bucket.provisioning_bucket.name
+#   source = data.archive_file.bigquery_external_function_zip.output_path
 
-  depends_on = [ 
-    google_storage_bucket.provisioning_bucket,
-    data.archive_file.bigquery_external_function_zip
-    ]  
-}
+#   depends_on = [ 
+#     google_storage_bucket.provisioning_bucket,
+#     data.archive_file.bigquery_external_function_zip
+#     ]  
+# }
 
-# # Create the function
-resource "google_cloudfunctions2_function" "function" {
-  #provider = google-beta
-  project     = var.project_id
-  name        = "bq-sp-transform-${random_id.id.hex}"
-  location    = var.region
-  description = "gcs-load-bq"
+# # # Create the function
+# resource "google_cloudfunctions2_function" "function" {
+#   #provider = google-beta
+#   project     = var.project_id
+#   name        = "bq-sp-transform-${random_id.id.hex}"
+#   location    = var.region
+#   description = "gcs-load-bq"
 
-  build_config {
-    runtime     = "python310"
-    entry_point = "bq_sp_transform"
-    source {
-      storage_source {
-        bucket = google_storage_bucket.provisioning_bucket.name
-        object = "bigquery-external-function.zip"
-      }
-    }
-  }
+#   build_config {
+#     runtime     = "python310"
+#     entry_point = "bq_sp_transform"
+#     source {
+#       storage_source {
+#         bucket = google_storage_bucket.provisioning_bucket.name
+#         object = "bigquery-external-function.zip"
+#       }
+#     }
+#   }
 
-  service_config {
-    max_instance_count = 1
-    available_memory   = "256M"
-    timeout_seconds    = 540
-    environment_variables = {
-        PROJECT_ID = var.project_id
-        BUCKET_ID = google_storage_bucket.raw_bucket.name
-    }
-    service_account_email = google_service_account.cloud_function_service_account.email
-  }
+#   service_config {
+#     max_instance_count = 1
+#     available_memory   = "256M"
+#     timeout_seconds    = 540
+#     environment_variables = {
+#         PROJECT_ID = var.project_id
+#         BUCKET_ID = google_storage_bucket.raw_bucket.name
+#     }
+#     service_account_email = google_service_account.cloud_function_service_account.email
+#   }
 
-  event_trigger {
-    trigger_region = var.region
-    event_type     = "google.cloud.storage.object.v1.finalized"
-    event_filters {
-         attribute = "bucket"
-         value = google_storage_bucket.raw_bucket.name
-    }
-    retry_policy   = "RETRY_POLICY_RETRY"
-    }
+#   event_trigger {
+#     trigger_region = var.region
+#     event_type     = "google.cloud.storage.object.v1.finalized"
+#     event_filters {
+#          attribute = "bucket"
+#          value = google_storage_bucket.raw_bucket.name
+#     }
+#     retry_policy   = "RETRY_POLICY_RETRY"
+#     }
 
-  depends_on = [
-    google_storage_bucket.provisioning_bucket,
-    google_storage_bucket.raw_bucket,
-    google_project_iam_member.cloud_function_service_account_editor_role
-  ]
-} 
+#   depends_on = [
+#     google_storage_bucket.provisioning_bucket,
+#     google_storage_bucket.raw_bucket,
+#     google_project_iam_member.cloud_function_service_account_editor_role
+#   ]
+# } 
 
 
 
-resource "google_storage_bucket_object" "startfile" {
-  bucket = google_storage_bucket.raw_bucket
-  name   = "startfile"
-  source = "assets/startfile"
+# resource "google_storage_bucket_object" "startfile" {
+#   bucket = google_storage_bucket.raw_bucket
+#   name   = "startfile"
+#   source = "assets/startfile"
 
-  depends_on = [
-    google_cloudfunctions2_function.function
-  ]
+#   depends_on = [
+#     google_cloudfunctions2_function.function
+#   ]
 
-}
+# }
