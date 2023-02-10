@@ -87,8 +87,8 @@ resource "google_storage_bucket_object" "parquet_files" {
   for_each = fileset("assets/parquet/", "*")
 
   bucket = google_storage_bucket.raw_bucket
-  name   = each.key
-  source = "assets/parquet/${each.key}"
+  name   = "${each.value}"
+  source = "assets/parquet/${each.value}"
 
 }
 
