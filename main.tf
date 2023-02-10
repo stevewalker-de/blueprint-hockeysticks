@@ -268,10 +268,10 @@ resource "google_bigquery_data_transfer_config" "query_config" {
   
   display_name           = "nightly-load-query"
   project                = var.project_id
-  location               = "US" # var.region
+  location               = var.region
   data_source_id         = "nightly_load_query"
   schedule               = "every day 00:00"
-  # destination_dataset_id = google_bigquery_dataset.ds_edw.dataset_id
+  destination_dataset_id = google_bigquery_dataset.ds_edw.dataset_id
   params = {
     destination_table_name_template = "lookerstudio_report"
     write_disposition               = "OVERWRITE"
