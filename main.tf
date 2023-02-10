@@ -228,9 +228,8 @@ resource "google_cloudfunctions2_function" "function" {
          attribute = "bucket"
          value = google_storage_bucket.raw_bucket.name
     }
-    }
     retry_policy   = "RETRY_POLICY_RETRY"
-  }
+    }
 
   depends_on = [
     google_storage_bucket.provisioning_bucket,
