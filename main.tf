@@ -205,8 +205,7 @@ resource "google_bigquery_routine" "sp_sample_queries" {
 }
 
 
-# # Add Bigquery ML ModelTODO: Add ML Query Upload, add to cloud function
-# # TODO: Get Model Code from Steve
+# # Add Bigquery ML Model
 data "template_file" "sp_bigqueryml_model" {
   template = "${file("assets/sql/sp_bigqueryml_model.sql")}"
   vars = {
@@ -249,6 +248,31 @@ resource "google_bigquery_routine" "sp_sample_translation_queries" {
   ]
 }
 
+resource "google_project_iam_member" "dts_permissions" {
+  project = data.google_project.project.project_id
+  role   = "roles/iam.serviceAccountTokenCreator"
+  member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
+}
+
+resource "google_bigquery_data_transfer_config" "query_config" {
+  
+  display_name           = "nightly-load-query"
+  project                = var.project_id
+  location               = var.region
+  data_source_id         = "nightly_load_query"
+  schedule               = "every day 00:00"
+  destination_dataset_id = google_bigquery_dataset.ds_edw.dataset_id
+  params = {
+    destination_table_name_template = "lookerstudio_report"
+    write_disposition               = "OVERWRITE"
+    query                           = "CALL `${var.project_id}.ds_edw.sp_lookerstudio_report`()"
+  }
+
+  depends_on = [
+    google_project_iam_member.dts_permissions,
+    google_bigquery_dataset.ds_edw.dataset_id
+  ]
+}
 
 # Notebooks instance
 # resource "google_notebooks_instance" "basic_instance" {
