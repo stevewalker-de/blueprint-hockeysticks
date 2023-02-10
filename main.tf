@@ -248,12 +248,15 @@ resource "google_bigquery_routine" "sp_sample_translation_queries" {
   ]
 }
 
+# Add Scheduled Query
+# # Set up DTS permissions
 resource "google_project_iam_member" "dts_permissions" {
   project = data.google_project.project.project_id
   role   = "roles/iam.serviceAccountTokenCreator"
   member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
 }
 
+# # Set up scheduled query
 resource "google_bigquery_data_transfer_config" "query_config" {
   
   display_name           = "nightly-load-query"
@@ -270,7 +273,7 @@ resource "google_bigquery_data_transfer_config" "query_config" {
 
   depends_on = [
     google_project_iam_member.dts_permissions,
-    google_bigquery_dataset.ds_edw.dataset_id
+    google_bigquery_dataset.ds_edw
   ]
 }
 
