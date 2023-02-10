@@ -90,11 +90,11 @@ resource "google_storage_bucket_object" "parquet_files" {
 resource "google_bigquery_table" "tbl_edw_taxi" {
   dataset_id = google_bigquery_dataset.ds_edw.dataset_id
   table_id   = "taxi_trips"
-  # deletion_protection = false 
+  deletion_protection = false 
 
   external_data_configuration {
     autodetect    = true
-    connection_id = "${var.project_id}.${var.region}.ds_connection"
+    connection_id = "g-sql-morphic-luminous.us-central1.ds_connection" # "${var.project_id}.${var.region}.ds_connection"
     source_format = "PARQUET"
     source_uris = ["gs://${google_storage_bucket.raw_bucket.name}/taxi-*.Parquet"]
     
