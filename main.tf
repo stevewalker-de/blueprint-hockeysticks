@@ -2,6 +2,33 @@ data "google_project" "project" {
   project_id = var.project_id
 }
 
+module "project-services" {
+  source                      = "terraform-google-modules/project-factory/google//modules/project_services"
+  version                     = "13.0.0"
+  disable_services_on_destroy = false
+
+  project_id  = var.project_id
+  enable_apis = var.enable_apis
+
+  activate_apis = [
+    "compute.googleapis.com",
+    "cloudapis.googleapis.com",
+    "cloudbuild.googleapis.com",
+    "datacatalog.googleapis.com",
+    "datalineage.googleapis.com",
+    "eventarc.googleapis.com",
+    "bigquerymigration.googleapis.com",
+    "bigquerystorage.googleapis.com",
+    "bigqueryconnection.googleapis.com",
+    "bigqueryreservation.googleapis.com",
+    "bigquery.googleapis.com",
+    "storage.googleapis.com",
+    "storage-api.googleapis.com",
+    "run.googleapis.com",
+    "pubsub.googleapis.com"
+  ]
+}
+
 #random id
 resource "random_id" "id" {
 	  byte_length = 4
@@ -25,6 +52,7 @@ resource "google_project_iam_member" "cloud_function_service_account_editor_role
   ]
 }
 
+# TODO: Add scheduled load job
 
 # Set up Storage Buckets
 # # Set up the raw storage bucket
