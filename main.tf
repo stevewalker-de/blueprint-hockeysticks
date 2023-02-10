@@ -262,6 +262,12 @@ resource "google_project_iam_member" "dts_permissions_agent" {
   member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
 }
 
+resource "google_project_iam_member" "dts_permissions_bigquery" {
+  project = data.google_project.project.project_id
+  role   = "roles/bigquery.Admin"
+  member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
+}
+
 
 # # Set up scheduled query
 resource "google_bigquery_data_transfer_config" "query_config" {
