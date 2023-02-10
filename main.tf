@@ -270,7 +270,7 @@ resource "google_bigquery_data_transfer_config" "dts_config" {
   location               = var.region
   data_source_id         = "scheduled_query"
   schedule               = "every day 00:00"
-  destination_dataset_id = google_bigquery_dataset.ds_edw.dataset_id
+  # destination_dataset_id = google_bigquery_dataset.ds_edw.dataset_id
   params = {
     destination_table_name_template = "my_table"
     write_disposition               = "WRITE_TRUNCATE"
