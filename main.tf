@@ -90,6 +90,7 @@ resource "google_storage_bucket_object" "parquet_files" {
 resource "google_bigquery_table" "tbl_edw_taxi" {
   dataset_id = google_bigquery_dataset.ds_edw.dataset_id
   table_id   = "taxi_trips"
+  deletion_protection = false 
 
   external_data_configuration {
     autodetect    = true
@@ -150,7 +151,6 @@ resource "google_bigquery_routine" "sp_sample_queries" {
   ]
 }
 
-# TODO: Add view to scope data duration for better charting
 
 # TODO: Add ML Query Upload, add to cloud function
 
