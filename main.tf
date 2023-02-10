@@ -76,96 +76,96 @@ resource "google_project_iam_member" "bq_connection_iam_object_viewer" {
   ]
 }
 
-# # Upload files
-resource "google_storage_bucket_object" "parquet_files" {
-  for_each = fileset("assets/parquet/", "*")
+# # # Upload files
+# resource "google_storage_bucket_object" "parquet_files" {
+#   for_each = fileset(path.module, "assets/parquet/*")
 
-  bucket = google_storage_bucket.raw_bucket
-  name   = each.value
-  source = "assets/parquet/${each.value}"
+#   bucket = google_storage_bucket.raw_bucket
+#   name   = each.value
+#   source = "assets/parquet/${each.value}"
 
-}
+# }
 
-# # Create a BigQuery external table
-resource "google_bigquery_table" "tbl_edw_taxi" {
-  dataset_id = google_bigquery_dataset.ds_edw.dataset_id
-  table_id   = "tbl_edw_taxi"
+# # # Create a BigQuery external table
+# resource "google_bigquery_table" "tbl_edw_taxi" {
+#   dataset_id = google_bigquery_dataset.ds_edw.dataset_id
+#   table_id   = "tbl_edw_taxi"
 
-  external_data_configuration {
-    autodetect    = true
-    connection_id = "${var.project_id}.${var.region}.ds_connection"
-    source_format = "CSV"
-    source_uris = ["gs://${google_storage_bucket.raw_bucket.name}/taxi-*.Parquet"]
+#   external_data_configuration {
+#     autodetect    = true
+#     connection_id = "${var.project_id}.${var.region}.ds_connection"
+#     source_format = "CSV"
+#     source_uris = ["gs://${google_storage_bucket.raw_bucket.name}/taxi-*.Parquet"]
     
-  }
+#   }
 
-  depends_on = [
-    google_bigquery_connection.ds_connection,
-    google_storage_bucket.raw_bucket,
-    google_storage_bucket_object.parquet_files
-  ]
-}
+#   depends_on = [
+#     google_bigquery_connection.ds_connection,
+#     google_storage_bucket.raw_bucket,
+#     google_storage_bucket_object.parquet_files
+#   ]
+# }
 
-# TODO: Add Payment Type and Vendor Type Tables
+# # TODO: Add Payment Type and Vendor Type Tables
 
 
 
-# Add Looker Studio Data Report Procedure
-data "template_file" "sp_lookerstudio_report" {
-  template = "${file("assets/sql/sp_lookerstudio_report.sql")}"
-  vars = {
-    project_id = var.project_id
-  }  
-}
-resource "google_bigquery_routine" "sproc_sp_demo_datastudio_report" {
-  dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
-  routine_id      = "sp_lookerstudio_report"
-  routine_type    = "PROCEDURE"
-  language        = "SQL"
-  definition_body = "${data.template_file.sp_lookerstudio_report.rendered}"
+# # Add Looker Studio Data Report Procedure
+# data "template_file" "sp_lookerstudio_report" {
+#   template = "${file("assets/sql/sp_lookerstudio_report.sql")}"
+#   vars = {
+#     project_id = var.project_id
+#   }  
+# }
+# resource "google_bigquery_routine" "sproc_sp_demo_datastudio_report" {
+#   dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
+#   routine_id      = "sp_lookerstudio_report"
+#   routine_type    = "PROCEDURE"
+#   language        = "SQL"
+#   definition_body = "${data.template_file.sp_lookerstudio_report.rendered}"
 
-  depends_on = [
-    google_bigquery_table.tbl_edw_taxi,
-    data.template_file.sp_lookerstudio_report
-  ]
-}
+#   depends_on = [
+#     google_bigquery_table.tbl_edw_taxi,
+#     data.template_file.sp_lookerstudio_report
+#   ]
+# }
 
-# Add Sample Queries
-data "template_file" "sp_sample_queries" {
-  template = "${file("../sql-scripts/taxi_dataset/sp_demo_datastudio_report.sql")}"
-  vars = {
-    project_id = var.project_id
-  }  
-}
-resource "google_bigquery_routine" "sp_sample_queries" {
-  dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
-  routine_id      = "sp_sample_queries"
-  routine_type    = "PROCEDURE"
-  language        = "SQL"
-  definition_body = "${data.template_file.sp_sample_queries.rendered}"
+# # Add Sample Queries
+# data "template_file" "sp_sample_queries" {
+#   template = "${file("../sql-scripts/taxi_dataset/sp_demo_datastudio_report.sql")}"
+#   vars = {
+#     project_id = var.project_id
+#   }  
+# }
+# resource "google_bigquery_routine" "sp_sample_queries" {
+#   dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
+#   routine_id      = "sp_sample_queries"
+#   routine_type    = "PROCEDURE"
+#   language        = "SQL"
+#   definition_body = "${data.template_file.sp_sample_queries.rendered}"
 
-  depends_on = [
-    google_bigquery_table.tbl_edw_taxi,
-    data.template_file.sp_sample_queries
-  ]
+#   depends_on = [
+#     google_bigquery_table.tbl_edw_taxi,
+#     data.template_file.sp_sample_queries
+#   ]
 }
 
 
 # Notebooks instance
-resource "google_notebooks_instance" "basic_instance" {
-  project                = var.project_id
-  name                   = "edw-notebook-${random_id.id.hex}"
-  provider               = google
-  location               = "us-east1-b"
-  machine_type           = "n1-standard-4"
-  post_startup_script    = "gs://solutions_terraform_assets_da/notebook_startup_script.sh"
+# resource "google_notebooks_instance" "basic_instance" {
+#   project                = var.project_id
+#   name                   = "edw-notebook-${random_id.id.hex}"
+#   provider               = google
+#   location               = "us-east1-b"
+#   machine_type           = "n1-standard-4"
+#   post_startup_script    = "gs://solutions_terraform_assets_da/notebook_startup_script.sh"
 
-    vm_image {
-    project      = "deeplearning-platform-release"
-    image_family = "common-cpu-notebooks-debian-10"
-  }
+#     vm_image {
+#     project      = "deeplearning-platform-release"
+#     image_family = "common-cpu-notebooks-debian-10"
+#   }
 
-}
+# }
 
 # Create a Cloud Function resource
 # # Zip the function file
