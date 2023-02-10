@@ -5,6 +5,9 @@ provider "google" {
   user_project_override = true
 }
 
+provider "random" {
+}
+
 #random id
 resource "random_id" "id" {
 	  byte_length = 4
