@@ -39,7 +39,7 @@ resource "google_storage_bucket" "raw_bucket" {
   location      = var.region
   uniform_bucket_level_access = true
 
-  public_access_prevention = "enforced"
+  # public_access_prevention = "enforced"
 }
 
 # # # Set up the provisioning bucketstorage bucket
