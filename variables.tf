@@ -12,10 +12,10 @@ variable region {
   description = "Google Cloud Region"
 }
 
-variable zone {
-  type        = string
-  description = "Google Cloud Zone"
-}
+# variable zone {
+#   type        = string
+#   description = "Google Cloud Zone"
+# }
 
 variable "labels" {
   type        = map(string)
