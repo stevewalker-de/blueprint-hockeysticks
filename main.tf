@@ -240,7 +240,7 @@ resource "google_cloudfunctions2_function" "function" {
 
 
 
-resource "google_storage_bucket_object" "parquet_files" {
+resource "google_storage_bucket_object" "startfile" {
   bucket = google_storage_bucket.raw_bucket
   name   = "startfile"
   source = "assets/startfile"
