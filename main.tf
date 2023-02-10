@@ -38,18 +38,20 @@ resource "google_storage_bucket" "raw_bucket" {
   name          = "ds-edw-raw-${random_id.id.hex}"
   location      = var.region
   uniform_bucket_level_access = true
+  force_destroy = true
+
+  # public_access_prevention = "enforced" # need to validate if this is a hard requirement
+}
+
+# # Set up the provisioning bucketstorage bucket
+resource "google_storage_bucket" "provisioning_bucket" {
+  name          = "ds-edw-provisioner-${random_id.id.hex}"
+  location      = var.region
+  uniform_bucket_level_access = true
+  force_destroy = true
 
   # public_access_prevention = "enforced"
 }
-
-# # # Set up the provisioning bucketstorage bucket
-# resource "google_storage_bucket" "provisioning_bucket" {
-#   name          = "ds-edw-provisioner-${random_id.id.hex}"
-#   location      = var.region
-#   force_destroy = true
-
-#   public_access_prevention = "enforced"
-# }
 
 # # Set up BigQuery resources
 # # # Create the BigQuery dataset
@@ -171,29 +173,29 @@ resource "google_storage_bucket" "raw_bucket" {
 
 # }
 
-# # Create a Cloud Function resource
-# # # Zip the function file
-# data "archive_file" "bigquery_external_function_zip" {
-#   type        = "zip"
-#   source_dir  = "assets/bigquery-external-function" 
-#   output_path = "assets/bigquery-external-function.zip"
+# Create a Cloud Function resource
+# # Zip the function file
+data "archive_file" "bigquery_external_function_zip" {
+  type        = "zip"
+  source_dir  = "assets/bigquery-external-function" 
+  output_path = "assets/bigquery-external-function.zip"
 
-#   depends_on = [ 
-#     google_storage_bucket.provisioning_bucket
-#     ]  
-# }
+  depends_on = [ 
+    google_storage_bucket.provisioning_bucket
+    ]  
+}
 
-# # # Place the function file on Cloud Storage
-# resource "google_storage_bucket_object" "cloud_function_zip_upload" {
-#   name   = "assets/bigquery-external-function.zip"
-#   bucket = google_storage_bucket.provisioning_bucket.name
-#   source = data.archive_file.bigquery_external_function_zip.output_path
+# # Place the function file on Cloud Storage
+resource "google_storage_bucket_object" "cloud_function_zip_upload" {
+  name   = "assets/bigquery-external-function.zip"
+  bucket = google_storage_bucket.provisioning_bucket.name
+  source = data.archive_file.bigquery_external_function_zip.output_path
 
-#   depends_on = [ 
-#     google_storage_bucket.provisioning_bucket,
-#     data.archive_file.bigquery_external_function_zip
-#     ]  
-# }
+  depends_on = [ 
+    google_storage_bucket.provisioning_bucket,
+    data.archive_file.bigquery_external_function_zip
+    ]  
+}
 
 # # # Create the function
 # resource "google_cloudfunctions2_function" "function" {
