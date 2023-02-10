@@ -250,13 +250,13 @@ resource "google_bigquery_routine" "sp_sample_translation_queries" {
 
 # Add Scheduled Query
 # # Set up DTS permissions
-resource "google_project_iam_member" "dts_permissions" {
+resource "google_project_iam_member" "dts_permissions_token" {
   project = data.google_project.project.project_id
   role   = "roles/iam.serviceAccountTokenCreator"
   member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
 }
 
-resource "google_project_iam_member" "dts_permissions" {
+resource "google_project_iam_member" "dts_permissions_agent" {
   project = data.google_project.project.project_id
   role   = "roles/bigquerydatatransfer.serviceAgent"
   member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
@@ -279,7 +279,8 @@ resource "google_bigquery_data_transfer_config" "query_config" {
   }
 
   depends_on = [
-    google_project_iam_member.dts_permissions,
+    google_project_iam_member.dts_permissions_token,
+    google_project_iam_member.dts_permissions_agent,
     google_bigquery_dataset.ds_edw
   ]
 }
