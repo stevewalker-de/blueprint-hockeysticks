@@ -38,32 +38,32 @@ resource "google_storage_bucket" "raw_bucket" {
   public_access_prevention = "enforced"
 }
 
-# # Set up the provisioning bucketstorage bucket
-resource "google_storage_bucket" "provisioning_bucket" {
-  name          = "ds-edw-provisioner-${random_id.id.hex}"
-  location      = var.region
-  force_destroy = true
+# # # Set up the provisioning bucketstorage bucket
+# resource "google_storage_bucket" "provisioning_bucket" {
+#   name          = "ds-edw-provisioner-${random_id.id.hex}"
+#   location      = var.region
+#   force_destroy = true
 
-  public_access_prevention = "enforced"
-}
+#   public_access_prevention = "enforced"
+# }
 
-# Set up BigQuery resources
-# # Create the BigQuery dataset
-resource "google_bigquery_dataset" "ds_edw" {
+# # Set up BigQuery resources
+# # # Create the BigQuery dataset
+# resource "google_bigquery_dataset" "ds_edw" {
 
-  dataset_id    = "ds_edw"
-  friendly_name = "My EDW Dataset"
-  description   = "My EDW Dataset with tables"
-  location      = var.region
-}
+#   dataset_id    = "ds_edw"
+#   friendly_name = "My EDW Dataset"
+#   description   = "My EDW Dataset with tables"
+#   location      = var.region
+# }
 
-# # Create a BigQuery connection
-resource "google_bigquery_connection" "ds_connection" {
-   connection_id = "ds_connection"
-   location      = var.region
-   friendly_name = "Storage Bucket Connection"
-   cloud_resource {}
-}
+# # # Create a BigQuery connection
+# resource "google_bigquery_connection" "ds_connection" {
+#    connection_id = "ds_connection"
+#    location      = var.region
+#    friendly_name = "Storage Bucket Connection"
+#    cloud_resource {}
+# }
 
 # # # Grant IAM access to the BigQuery Connection account for Cloud Storage
 # resource "google_project_iam_member" "bq_connection_iam_object_viewer" {
