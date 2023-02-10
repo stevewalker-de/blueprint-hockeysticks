@@ -38,7 +38,6 @@ resource "google_storage_bucket" "raw_bucket" {
   name          = "ds-edw-raw-${random_id.id.hex}"
   location      = var.region
   uniform_bucket_level_access = true
-  force_destroy = true
 
   public_access_prevention = "enforced"
 }
