@@ -2,6 +2,33 @@ data "google_project" "project" {
   project_id = var.project_id
 }
 
+module "project-services" {
+  source                      = "terraform-google-modules/project-factory/google//modules/project_services"
+  version                     = "13.0.0"
+  disable_services_on_destroy = false
+
+  project_id  = var.project_id
+  enable_apis = var.enable_apis
+
+  activate_apis = [
+    "compute.googleapis.com",
+    "cloudapis.googleapis.com",
+    "cloudbuild.googleapis.com",
+    "datacatalog.googleapis.com",
+    "datalineage.googleapis.com",
+    "eventarc.googleapis.com",
+    "bigquerymigration.googleapis.com",
+    "bigquerystorage.googleapis.com",
+    "bigqueryconnection.googleapis.com",
+    "bigqueryreservation.googleapis.com",
+    "bigquery.googleapis.com",
+    "storage.googleapis.com",
+    "storage-api.googleapis.com",
+    "run.googleapis.com",
+    "pubsub.googleapis.com"
+  ]
+}
+
 #random id
 resource "random_id" "id" {
 	  byte_length = 4
@@ -25,11 +52,13 @@ resource "google_project_iam_member" "cloud_function_service_account_editor_role
   ]
 }
 
+# TODO: Add scheduled load job
 
 # Set up Storage Buckets
 # # Set up the raw storage bucket
 resource "google_storage_bucket" "raw_bucket" {
   name          = "ds-edw-raw-${random_id.id.hex}"
+  project     = var.project_id
   location      = var.region
   uniform_bucket_level_access = true
   force_destroy = true
@@ -40,6 +69,7 @@ resource "google_storage_bucket" "raw_bucket" {
 # # Set up the provisioning bucketstorage bucket
 resource "google_storage_bucket" "provisioning_bucket" {
   name          = "ds-edw-provisioner-${random_id.id.hex}"
+  project     = var.project_id
   location      = var.region
   uniform_bucket_level_access = true
   force_destroy = true
@@ -50,7 +80,7 @@ resource "google_storage_bucket" "provisioning_bucket" {
 # Set up BigQuery resources
 # # Create the BigQuery dataset
 resource "google_bigquery_dataset" "ds_edw" {
-
+  project     = var.project_id
   dataset_id    = "ds_edw"
   friendly_name = "My EDW Dataset"
   description   = "My EDW Dataset with tables"
@@ -59,6 +89,7 @@ resource "google_bigquery_dataset" "ds_edw" {
 
 # # Create a BigQuery connection
 resource "google_bigquery_connection" "ds_connection" {
+   project     = var.project_id
    connection_id = "ds_connection"
    location      = var.region
    friendly_name = "Storage Bucket Connection"
@@ -90,11 +121,12 @@ resource "google_storage_bucket_object" "parquet_files" {
 resource "google_bigquery_table" "tbl_edw_taxi" {
   dataset_id = google_bigquery_dataset.ds_edw.dataset_id
   table_id   = "taxi_trips"
+  project    = var.project_id
   deletion_protection = false 
 
   external_data_configuration {
     autodetect    = true
-    connection_id = "${var.project_id}.${var.region}.ds_connection"
+    connection_id =  "${var.project_id}.${var.region}.ds_connection"
     source_format = "PARQUET"
     source_uris = ["gs://${google_storage_bucket.raw_bucket.name}/taxi-*.Parquet"]
     
@@ -107,11 +139,30 @@ resource "google_bigquery_table" "tbl_edw_taxi" {
   ]
 }
 
-# # TODO: Add Payment Type and Vendor Type Tables
+# Load Queries for Stored Procedure Execution
+# # Load Lookup Data Tables
+data "template_file" "sp_provision_lookup_tables" {
+  template = "${file("assets/sql/sp_provision_lookup_tables.sql")}"
+  vars = {
+    project_id = var.project_id
+  }  
+}
+resource "google_bigquery_routine" "sp_provision_lookup_tables" {
+  project     = var.project_id
+  dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
+  routine_id      = "sp_provision_lookup_tables"
+  routine_type    = "PROCEDURE"
+  language        = "SQL"
+  definition_body = "${data.template_file.sp_provision_lookup_tables.rendered}"
+
+  depends_on = [
+    google_bigquery_dataset.ds_edw,
+    data.template_file.sp_provision_lookup_tables
+  ]
+}
 
 
-
-# Add Looker Studio Data Report Procedure
+# # Add Looker Studio Data Report Procedure
 data "template_file" "sp_lookerstudio_report" {
   template = "${file("assets/sql/sp_lookerstudio_report.sql")}"
   vars = {
@@ -119,6 +170,7 @@ data "template_file" "sp_lookerstudio_report" {
   }  
 }
 resource "google_bigquery_routine" "sproc_sp_demo_datastudio_report" {
+  project     = var.project_id
   dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
   routine_id      = "sp_lookerstudio_report"
   routine_type    = "PROCEDURE"
@@ -131,7 +183,7 @@ resource "google_bigquery_routine" "sproc_sp_demo_datastudio_report" {
   ]
 }
 
-# Add Sample Queries
+# # Add Sample Queries
 data "template_file" "sp_sample_queries" {
   template = "${file("assets/sql/sp_sample_queries.sql")}"
   vars = {
@@ -139,6 +191,7 @@ data "template_file" "sp_sample_queries" {
   }  
 }
 resource "google_bigquery_routine" "sp_sample_queries" {
+  project     = var.project_id
   dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
   routine_id      = "sp_sample_queries"
   routine_type    = "PROCEDURE"
@@ -152,9 +205,84 @@ resource "google_bigquery_routine" "sp_sample_queries" {
 }
 
 
-# TODO: Add ML Query Upload, add to cloud function
+# # Add Bigquery ML Model
+data "template_file" "sp_bigqueryml_model" {
+  template = "${file("assets/sql/sp_bigqueryml_model.sql")}"
+  vars = {
+    project_id = var.project_id
+  }  
+}
+resource "google_bigquery_routine" "sp_bigqueryml_model" {
+  project     = var.project_id
+  dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
+  routine_id      = "sp_bigqueryml_model"
+  routine_type    = "PROCEDURE"
+  language        = "SQL"
+  definition_body = "${data.template_file.sp_bigqueryml_model.rendered}"
 
-# TODO: Add translator
+  depends_on = [
+    google_bigquery_table.tbl_edw_taxi,
+    data.template_file.sp_bigqueryml_model
+  ]
+}
+
+# # Add Translation Scripts
+# # TODO: Get translation Code from Mohit
+data "template_file" "sp_sample_translation_queries" {
+  template = "${file("assets/sql/sp_sample_translation_queries.sql")}"
+  vars = {
+    project_id = var.project_id
+  }  
+}
+resource "google_bigquery_routine" "sp_sample_translation_queries" {
+  project     = var.project_id
+  dataset_id      = google_bigquery_dataset.ds_edw.dataset_id
+  routine_id      = "sp_sample_translation_queries"
+  routine_type    = "PROCEDURE"
+  language        = "SQL"
+  definition_body = "${data.template_file.sp_sample_translation_queries.rendered}"
+
+  depends_on = [
+    google_bigquery_table.tbl_edw_taxi,
+    data.template_file.sp_sample_translation_queries
+  ]
+}
+
+# Add Scheduled Query
+# # Set up DTS permissions
+resource "google_project_iam_member" "dts_permissions_token" {
+  project = data.google_project.project.project_id
+  role   = "roles/iam.serviceAccountTokenCreator"
+  member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
+}
+
+resource "google_project_iam_member" "dts_permissions_agent" {
+  project = data.google_project.project.project_id
+  role   = "roles/bigquerydatatransfer.serviceAgent"
+  member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
+}
+
+# Set up scheduled query
+resource "google_bigquery_data_transfer_config" "dts_config" {
+  
+  display_name           = "nightlyloadquery"
+  project                = var.project_id
+  location               = var.region
+  data_source_id         = "scheduled_query"
+  schedule               = "every day 00:00"
+  # destination_dataset_id = google_bigquery_dataset.ds_edw.dataset_id
+  params = {
+    destination_table_name_template = "my_table"
+    write_disposition               = "WRITE_TRUNCATE"
+    query                           = "CALL `${var.project_id}.ds_edw.sp_lookerstudio_report`()"
+  }
+
+  depends_on = [
+    google_project_iam_member.dts_permissions_token,
+    google_project_iam_member.dts_permissions_agent,
+    google_bigquery_dataset.ds_edw
+  ]
+}
 
 # Notebooks instance
 # resource "google_notebooks_instance" "basic_instance" {
@@ -245,13 +373,13 @@ resource "google_cloudfunctions2_function" "function" {
 
 
 
-# resource "google_storage_bucket_object" "startfile" {
-#   bucket = google_storage_bucket.raw_bucket.name
-#   name   = "startfile"
-#   source = "assets/startfile"
+resource "google_storage_bucket_object" "startfile" {
+  bucket = google_storage_bucket.raw_bucket.name
+  name   = "startfile"
+  source = "assets/startfile"
 
-#   depends_on = [
-#     google_cloudfunctions2_function.function
-#   ]
+  depends_on = [
+    google_cloudfunctions2_function.function
+  ]
 
-# }
+}

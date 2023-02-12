@@ -1,0 +1,1 @@
+SELECT 'TRANSLATION QUERIES GO HERE' as value_text
