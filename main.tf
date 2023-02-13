@@ -273,7 +273,7 @@ resource "google_bigquery_data_transfer_config" "dts_config" {
   # destination_dataset_id = google_bigquery_dataset.ds_edw.dataset_id
   params = {
     destination_table_name_template = "my_table"
-    write_disposition               = "WRITE_TRUNCATE"
+    # write_disposition               = "WRITE_TRUNCATE"
     query                           = "CALL `${var.project_id}.ds_edw.sp_lookerstudio_report`()"
   }
 
