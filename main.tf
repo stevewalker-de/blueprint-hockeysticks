@@ -351,7 +351,7 @@ resource "google_cloudfunctions2_function" "function" {
     event_type     = "google.cloud.storage.object.v1.finalized"
     event_filters {
          attribute = "bucket"
-         value = google_storage_bucket.raw_bucket.name
+         value = google_storage_bucket.provisioning_bucket.name
     }
     retry_policy   = "RETRY_POLICY_RETRY"
     }
@@ -366,7 +366,7 @@ resource "google_cloudfunctions2_function" "function" {
 
 
 resource "google_storage_bucket_object" "startfile" {
-  bucket = google_storage_bucket.raw_bucket.name
+  bucket = google_storage_bucket.provisioning_bucket.name
   name   = "startfile"
   source = "assets/startfile"
 
