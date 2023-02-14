@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-terraform {
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "~> 4.0"
-    }
-  }
-  required_version = ">= 0.13"
+variable "project_id" {
+  description = "The ID of the project in which to provision resources."
+  type        = string
+}
+
+variable "region" {
+  description = "The region to deploy services in."
+  type        = string
 }

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-module "ssw" {
-  source = "../.."
+module "data_warehouse" {
+  source = "../../examples/data_warehouse"
 
   project_id  = var.project_id
-  bucket_name = var.bucket_name
+  region = var.region
 }
