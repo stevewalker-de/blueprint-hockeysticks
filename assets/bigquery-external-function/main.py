@@ -54,11 +54,8 @@ def gcs_export_bq():
     client = bigquery.Client()
     BUCKET_ID = os.environ.get("BUCKET_ID")
     PROJECT_ID = os.environ.get("PROJECT_ID")
-    DATASET_ID = 'bigquery-public-data'
 
     destination_uri = "gs://{}/{}".format(BUCKET_ID, "taxi-*.Parquet")
-    dataset_ref = bigquery.DatasetReference(PROJECT_ID, DATASET_ID)
-    table_ref = dataset_ref.table("shakespeare")
     job_config = bigquery.job.ExtractJobConfig()
     job_config.compression = bigquery.Compression.GZIP
     job_config.destination_format = "PARQUET"

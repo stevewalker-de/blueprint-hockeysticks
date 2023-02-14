@@ -22,11 +22,11 @@ SELECT FORMAT_DATE("%w", Pickup_DateTime) AS WeekdayNumber,
        vendor.Vendor_Description,
        payment_type.Payment_Type_Description,
        SUM(taxi_trips.Total_Amount) AS high_value_trips
-  FROM `g-sql-morphic-luminous.ds_edw.taxi_trips` AS taxi_trips
-       INNER JOIN `g-sql-morphic-luminous.ds_edw.vendor` AS vendor 
+  FROM `${project_id}.ds_edw.taxi_trips` AS taxi_trips
+       INNER JOIN `${project_id}.ds_edw.vendor` AS vendor 
                ON cast(taxi_trips.Vendor_Id as INT64) = vendor.Vendor_Id
               AND taxi_trips.Pickup_DateTime BETWEEN '2022-01-01' AND '2022-02-01' 
-        LEFT JOIN `g-sql-morphic-luminous.ds_edw.payment_type` AS payment_type
+        LEFT JOIN `${project_id}.ds_edw.payment_type` AS payment_type
                ON cast(taxi_trips.payment_type as INT64) = payment_type.Payment_Type_Id
 GROUP BY 1, 2, 3, 4
 HAVING SUM(taxi_trips.Total_Amount) > 50
@@ -44,7 +44,7 @@ SELECT CAST(Pickup_DateTime AS DATE) AS Pickup_Date,
                                  taxi_trips.payment_type
                         ORDER BY taxi_trips.Passenger_Count DESC, 
                                  taxi_trips.Total_Amount DESC) AS Ranking
-  FROM `g-sql-morphic-luminous.ds_edw.taxi_trips` AS taxi_trips
+  FROM `${project_id}.ds_edw.taxi_trips` AS taxi_trips
  WHERE taxi_trips.Pickup_DateTime BETWEEN '2022-01-01' AND '2022-02-01' 
    AND cast(taxi_trips.payment_type as INT64) IN (1,2)
 )
@@ -53,7 +53,7 @@ SELECT Pickup_Date,
        Passenger_Count,
        Total_Amount
   FROM TaxiDataRanking
-       INNER JOIN `g-sql-morphic-luminous.ds_edw.payment_type` AS payment_type
+       INNER JOIN `${project_id}.ds_edw.payment_type` AS payment_type
                ON TaxiDataRanking.Payment_Type_Id = payment_type.Payment_Type_Id
 WHERE Ranking = 1
 ORDER BY Pickup_Date, Payment_Type_Description;
@@ -71,7 +71,7 @@ SELECT FORMAT_DATE("%B", taxi_trips.Pickup_DateTime) AS MonthName,
          END AS PaymentDescription,
        taxi_trips.Passenger_Count,
        taxi_trips.Total_Amount
-  FROM `g-sql-morphic-luminous.ds_edw.taxi_trips` AS taxi_trips
+  FROM `${project_id}.ds_edw.taxi_trips` AS taxi_trips
  WHERE taxi_trips.Pickup_DateTime BETWEEN '2022-01-01' AND '2022-02-01'
    AND Passenger_Count IS NOT NULL
    AND cast(payment_type as INT64) IN (1,2,3,4)
@@ -98,7 +98,7 @@ SELECT FORMAT_DATE("%B", taxi_trips.Pickup_DateTime) AS MonthName,
             WHEN cast(taxi_trips.payment_type as INT64) = 4 THEN 'Dispute'
          END AS PaymentDescription,
        SUM(taxi_trips.Total_Amount) AS Total_Amount
-  FROM `g-sql-morphic-luminous.ds_edw.taxi_trips` AS taxi_trips
+  FROM `${project_id}.ds_edw.taxi_trips` AS taxi_trips
  WHERE taxi_trips.Pickup_DateTime BETWEEN '2022-01-01' AND '2022-02-01'
    AND Passenger_Count IS NOT NULL
    AND cast(taxi_trips.payment_type as INT64) IN (1,2,3,4)
@@ -121,7 +121,7 @@ SELECT FORMAT_DATE("%B", Pickup_DateTime) AS MonthName,
        FORMAT_DATE("%m", Pickup_DateTime) AS MonthNumber,
        FORMAT_DATE("%A", Pickup_DateTime) AS WeekdayName,
        SUM(taxi_trips.Total_Amount) AS Total_Amount
-  FROM `g-sql-morphic-luminous.ds_edw.taxi_trips` AS taxi_trips
+  FROM `${project_id}.ds_edw.taxi_trips` AS taxi_trips
  WHERE taxi_trips.Pickup_DateTime BETWEEN '2022-01-01' AND '2022-02-01'
    AND cast(taxi_trips.payment_type as INT64) IN (1,2,3,4)
  GROUP BY 1, 2, 3
