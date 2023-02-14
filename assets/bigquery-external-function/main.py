@@ -91,11 +91,9 @@ def gcs_copy():
 
     for blob in blob_list:
         source_blob = source_bucket.blob(blob)
-    
-        destination_generation_match_precondition = 0
 
         blob_copy = source_bucket.copy_blob(
-            source_blob, destination_bucket, blob, if_generation_match=destination_generation_match_precondition,
+            source_blob, destination_bucket, blob,
         )
     
     
