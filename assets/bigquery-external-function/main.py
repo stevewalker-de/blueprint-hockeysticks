@@ -52,10 +52,10 @@ def gcs_export_bq():
 
     from google.cloud import bigquery
     client = bigquery.Client()
-    BUCKET_ID = os.environ.get("BUCKET_ID")
+    EXPORT_BUCKET_ID = os.environ.get("EXPORT_BUCKET_ID")
     PROJECT_ID = os.environ.get("PROJECT_ID")
 
-    destination_uri = "gs://{}/{}".format(BUCKET_ID, "taxi-*.Parquet")
+    destination_uri = "gs://{}/{}".format(EXPORT_BUCKET_ID, "taxi-*.Parquet")
     job_config = bigquery.job.ExtractJobConfig()
     job_config.compression = bigquery.Compression.GZIP
     job_config.destination_format = "PARQUET"
