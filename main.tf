@@ -227,7 +227,6 @@ resource "google_bigquery_routine" "sp_bigqueryml_model" {
 }
 
 # # Add Translation Scripts
-# # TODO: Get translation Code from Mohit
 data "template_file" "sp_sample_translation_queries" {
   template = "${file("assets/sql/sp_sample_translation_queries.sql")}"
   vars = {
@@ -270,10 +269,7 @@ resource "google_bigquery_data_transfer_config" "dts_config" {
   location               = var.region
   data_source_id         = "scheduled_query"
   schedule               = "every day 00:00"
-  # destination_dataset_id = google_bigquery_dataset.ds_edw.dataset_id
   params = {
-    # destination_table_name_template = "my_table"
-    # write_disposition               = "WRITE_TRUNCATE"
     query                           = "CALL `${var.project_id}.ds_edw.sp_lookerstudio_report`()"
   }
 
@@ -283,22 +279,6 @@ resource "google_bigquery_data_transfer_config" "dts_config" {
     google_bigquery_dataset.ds_edw
   ]
 }
-
-# Notebooks instance
-# resource "google_notebooks_instance" "basic_instance" {
-#   project                = var.project_id
-#   name                   = "edw-notebook-${random_id.id.hex}"
-#   provider               = google
-#   location               = "us-east1-b"
-#   machine_type           = "n1-standard-4"
-#   post_startup_script    = "gs://solutions_terraform_assets_da/notebook_startup_script.sh"
-
-#     vm_image {
-#     project      = "deeplearning-platform-release"
-#     image_family = "common-cpu-notebooks-debian-10"
-#   }
-
-# }
 
 # Create a Cloud Function resource
 # # Zip the function file
