@@ -1,3 +1,10 @@
+/* Run a query to see the prediction results of the model 
+--
+select * from ML.PREDICT(MODEL ds_edw.model_taxi_estimate, 
+  TABLE ds_edw.taxi_trips)
+  limit 1000;  */ 
+
+--Model Example
 CREATE OR REPLACE MODEL
   `${project_id}.ds_edw.model_taxi_estimate` OPTIONS ( MODEL_TYPE='LINEAR_REG',
     LS_INIT_LEARN_RATE=0.15,
@@ -17,3 +24,4 @@ FROM
   `${project_id}.ds_edw.taxi_trips`
 WHERE
   fare_amount > 0;
+

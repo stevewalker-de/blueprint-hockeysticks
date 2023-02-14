@@ -18,7 +18,7 @@ SELECT VENDOR_ID as TaxiCompany,
        SUM(Tip_Amount)                             AS Total_Tip_Amount,
        SUM(Total_Amount)                           AS Total_Total_Amount
   FROM `${project_id}.ds_edw.taxi_trips` AS taxi_trips
- WHERE Pickup_DateTime BETWEEN '2015-01-01' AND '2021-12-31'  -- There is odd data in some of the source files from NYC
+ WHERE Pickup_DateTime BETWEEN '2022-01-01' AND '2022-02-02' --'2015-01-01' AND '2021-12-31'   -- There is odd data in some of the source files from NYC
  GROUP BY 1, 2, 3, 4, 5
 ) 
 , LagPercents AS
@@ -90,4 +90,4 @@ ORDER BY GroupPartition;
 
 CREATE OR REPLACE VIEW `${project_id}.ds_edw.vw_lookerstudio_report` as 
 SELECT * FROM `${project_id}.ds_edw.lookerstudio_report` 
-WHERE Year in (2021);
+WHERE Year in (2022);
