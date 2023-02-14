@@ -19,7 +19,7 @@ variable "project_id" {
   type        = string
 }
 
-variable "bucket_name" {
-  description = "The name of the bucket to create."
+variable "region" {
+  description = "The region to deploy services in."
   type        = string
 }
