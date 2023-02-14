@@ -17,3 +17,9 @@ FROM
   `${project_id}.ds_edw.taxi_trips`
 WHERE
   fare_amount > 0;
+
+/* Run a query to see the prediction results of the model 
+--
+select * from ML.PREDICT(MODEL ds_edw.model_taxi_estimate, 
+  TABLE ds_edw.taxi_trips)
+  limit 1000;  */ 
